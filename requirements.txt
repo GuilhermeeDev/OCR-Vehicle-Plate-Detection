@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+opencv-python
+torch
+torchvision
+ultralytics
+Pillow
+numpy
+paddleocr
+paddlepaddle
+python-multipart
+transformers
+timm
+mysql-connector-python
