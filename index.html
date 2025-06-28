@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inferência de Placas</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    .esquerda, .direita {
+      width: 50%;
+      padding: 40px;
+      overflow-y: auto;
+    }
+    .esquerda {
+      background-color: #ffffff;
+      border-right: 1px solid #ddd;
+    }
+    .direita {
+      background-color: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <div class="esquerda">
+    <h2>Envio de Mídia</h2>
+
+    <form id="mediaForm" style="display: flex; flex-direction: column; align-items: center;">
+      <label for="fileInput" style="margin-bottom: 10px; font-weight: bold;">Selecione uma imagem ou vídeo:</label>
+
+      <input
+        type="file"
+        id="fileInput"
+        name="file"
+        accept="image/*,video/*"
+        style="
+          padding: 10px;
+          border: 2px dashed #aaa;
+          border-radius: 8px;
+          width: 80%;
+          background-color: #fff;
+          cursor: pointer;
+          transition: border-color 0.3s ease;
+        "
+        onmouseover="this.style.borderColor='#4CAF50'"
+        onmouseout="this.style.borderColor='#aaa'"
+      >
+
+      <button
+        type="submit"
+        style="
+          margin-top: 20px;
+          padding: 10px 30px;
+          font-size: 16px;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        "
+        onmouseover="this.style.backgroundColor='#45a049'"
+        onmouseout="this.style.backgroundColor='#4CAF50'"
+      >
+        Enviar
+      </button>
+    </form>
+
+    <pre id="response" style="
+      margin-top: 20px;
+      width: 90%;
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      color: #333;
+      overflow-x: auto;
+    "></pre>
+  </div>
+
+  <div class="direita">
+    <h2>Resultados Salvos</h2>
+    <table id="resultados">
+      <thead>
+        <tr>
+          <th>Arquivo</th>
+          <th>Resultado</th>
+          <th>Data/Hora</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-resultados">
+
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById('mediaForm');
+    const input = document.getElementById('fileInput');
+    const responseDiv = document.getElementById('response');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      responseDiv.textContent = '';
+
+      if (!input.files.length) {
+        responseDiv.textContent = 'Por favor, selecione um arquivo antes de enviar.';
+        return;
+      }
+
+      const file = input.files[0];
+      const formData = new FormData();
+      const fieldName = file.type.startsWith('image/') ? 'foto' : 'video';
+      formData.append(fieldName, file);
+
+      let endpoint = '';
+      if (file.type.startsWith('image/')) {
+        endpoint = 'http://127.0.0.1:8000/foto/';
+      } else if (file.type.startsWith('video/')) {
+        endpoint = 'http://127.0.0.1:8000/video/';
+      } else {
+        responseDiv.textContent = 'Formato não suportado. Use foto ou vídeo.';
+        return;
+      }
+
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (res.ok) {
+          responseDiv.textContent = JSON.stringify(data, null, 2);
+          carregarResultados();
+        } else {
+          responseDiv.textContent = `Erro ${res.status}: ${data.message || res.statusText}`;
+        }
+      } catch (err) {
+        responseDiv.textContent = 'Erro na requisição: ' + err.message;
+      }
+    });
+
+    async function carregarResultados() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/resultados/');
+        const dados = await res.json();
+        const tabela = document.getElementById('tabela-resultados');
+        tabela.innerHTML = '';
+        dados.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.nome_arquivo}</td>
+            <td>${item.resultado}</td>
+            <td>${item.data_hora}</td>
+          `;
+          tabela.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Erro ao carregar resultados:', err);
+      }
+    }
+
+    window.onload = carregarResultados;
+  </script>
+</body>
+</html>
