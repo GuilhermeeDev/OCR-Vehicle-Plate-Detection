@@ -30,7 +30,15 @@ O **OCR-Vehicle-Plate-Detection** é uma aplicação fullstack que permite a det
 
 ### Como executar localmente:
 
-1.  Clone este repositório:  
+1.  Clone este repositório.  
 ```bash
 git clone https://github.com/GuilhermeeDev/OCR-Vehicle-Plate-Detection.git
 ```
+
+2.  Baixe as bibliotecas utilizadas na aplicação.
+```bash
+cd OCR-Vehicle-Plate-Detection
+pip --version
+pip install -r requirements.txt
+```
+
