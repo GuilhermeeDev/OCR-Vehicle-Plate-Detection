@@ -383,6 +383,7 @@ def listar_resultados():
         logging.error(f"Erro ao buscar resultados: {e}")
         return JSONResponse(status_code=500, content={"message": str(e)})
     
-#venv38\Scripts\python.exe -m uvicorn main:app --reload
+#python -m uvicorn main:app --reload --port 8000
+
 # PS .venv\Scripts\Activate.ps1
 # CMD .venv\Scripts\activate
