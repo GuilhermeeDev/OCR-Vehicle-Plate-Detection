@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS ocr_db;
+
+USE ocr_db;
+
+CREATE TABLE IF NOT EXISTS resultados_ocr (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_arquivo VARCHAR(255),
+    resultado TEXT,
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP
+);
